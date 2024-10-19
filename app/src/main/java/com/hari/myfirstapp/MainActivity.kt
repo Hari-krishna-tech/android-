@@ -22,19 +22,26 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.hari.myfirstapp.ui.theme.MyFirstAppTheme
+import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -55,6 +62,28 @@ class MainActivity : ComponentActivity() {
 fun UnitConverter() {
     val showUnitDropDown = remember { mutableStateOf(false) }
     val showUnitDropDown2 = remember { mutableStateOf(false) }
+    val dropDownSelection = remember { mutableStateOf("Meter") }
+    val dropDownSelection2 = remember { mutableStateOf("Meter") }
+    var inputValue by remember {mutableStateOf("")}
+    var result by remember { mutableStateOf(0.0) }
+    var conversionFactor by remember { mutableStateOf(1.0) }
+    var oConversionFactor by remember { mutableStateOf(1.0) }
+    var resultString by remember { mutableStateOf("") }
+
+
+    val customTextStyle = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontSize = 34.sp,
+    )
+
+    fun convertUnits() {
+        // ?: -> ternary operator in kotlin
+        // example result.toDoubleOrNull() ?: 0.0
+
+        result = ((inputValue.toDouble() * conversionFactor *100.0 / oConversionFactor)/100).toDouble();
+
+    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -63,11 +92,21 @@ fun UnitConverter() {
 
         Text(
             text = "Unit Converter ",
-            modifier = Modifier.padding(15.dp)
+            modifier = Modifier.padding(15.dp),
+            style = MaterialTheme.typography.headlineLarge
+
         )
 
-        OutlinedTextField(value= "",
-            onValueChange = {value:String -> println(value)})
+        OutlinedTextField(value= inputValue,
+            onValueChange = {value:String ->
+                run {
+                    if(value.toDoubleOrNull() != null) {
+
+                        inputValue= value
+                        convertUnits()
+                    }
+                }
+            }, label = {Text(text = "Enter Value")})
         Spacer(modifier=Modifier.height(15.dp))
         Row {
 
@@ -76,16 +115,36 @@ fun UnitConverter() {
                     showUnitDropDown.value = !showUnitDropDown.value;
                 }) {
 
-                    Text("Select")
+                    Text(dropDownSelection.value)
                     Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                 }
                DropdownMenu(expanded = showUnitDropDown.value, onDismissRequest = {
                    showUnitDropDown.value = false
                }) {
-                   DropdownMenuItem(text = {Text("Centimeter")},onClick = {})
-                   DropdownMenuItem(text = {Text("Meter")},onClick = {})
-                   DropdownMenuItem(text = {Text("Feet")},onClick = {})
-                   DropdownMenuItem(text = {Text("Millimeter")},onClick = {})
+                   DropdownMenuItem(text = {Text("Centimeter")},onClick = {
+                       dropDownSelection.value = "Centimeter"
+                       showUnitDropDown.value = false
+                       conversionFactor = 0.01
+                       convertUnits()
+                   })
+                   DropdownMenuItem(text = {Text("Meter")},onClick = {
+                       dropDownSelection.value = "Meter"
+                       showUnitDropDown.value = false
+                       conversionFactor = 1.0
+                       convertUnits()
+                   })
+                   DropdownMenuItem(text = {Text("Feet")},onClick = {
+                       dropDownSelection.value = "Feet"
+                       showUnitDropDown.value = false
+                       conversionFactor = 0.3048
+                       convertUnits()
+                   })
+                   DropdownMenuItem(text = {Text("Millimeter")},onClick = {
+                       dropDownSelection.value = "Millimeter"
+                       showUnitDropDown.value = false
+                       conversionFactor = 0.001
+                       convertUnits()
+                   })
 
                }
 
@@ -95,22 +154,42 @@ fun UnitConverter() {
                 Button(onClick = {
                     showUnitDropDown2.value = !showUnitDropDown2.value
                 }) {
-                    Text("Select")
+                    Text(dropDownSelection2.value)
                     Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                 }
                 DropdownMenu(expanded = showUnitDropDown2.value, onDismissRequest = {
                     showUnitDropDown2.value = false
                 }) {
-                    DropdownMenuItem(text = {Text("Centimeter")},onClick = {})
-                    DropdownMenuItem(text = {Text("Meter")},onClick = {})
-                    DropdownMenuItem(text = {Text("Feet")},onClick = {})
-                    DropdownMenuItem(text = {Text("Millimeter")},onClick = {})
+                    DropdownMenuItem(text = {Text("Centimeter")},onClick = {
+                        dropDownSelection2.value = "Centimeter"
+                        showUnitDropDown2.value = false
+                        oConversionFactor = 0.01
+                        convertUnits()
+                    })
+                    DropdownMenuItem(text = {Text("Meter")},onClick = {
+                        dropDownSelection2.value = "Meter"
+                        showUnitDropDown2.value = false
+                        oConversionFactor = 1.0
+                        convertUnits()
+                    })
+                    DropdownMenuItem(text = {Text("Feet")},onClick = {
+                        dropDownSelection2.value = "Feet"
+                        showUnitDropDown2.value = false
+                        oConversionFactor = 0.3048
+                        convertUnits()
+                    })
+                    DropdownMenuItem(text = {Text("Millimeter")},onClick = {
+                        dropDownSelection2.value = "Millimeter"
+                        showUnitDropDown2.value = false
+                        oConversionFactor = 0.001
+                        convertUnits()
+                    })
                 }
             }
 
         }
         Spacer(modifier = Modifier.height(15.dp))
-        Text("Result")
+        Text("Result : ${result} ${dropDownSelection2.value}", style = MaterialTheme.typography.bodyLarge)
     }
 }
 
